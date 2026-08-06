@@ -1,0 +1,29 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "desqueeze"
+version = "1.0.0"
+description = "Batch CLI to desqueeze anamorphic RAW photo stills into full-resolution TIFF/DNG"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "rawpy>=0.21",
+    "numpy>=1.24",
+    "opencv-python-headless>=4.9",
+    "tifffile>=2024.1.30",
+    "click>=8.1",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=8.0"]
+
+[project.scripts]
+desqueeze = "desqueeze.cli:main"
+
+[tool.setuptools.packages.find]
+include = ["desqueeze*"]
+
+[tool.setuptools.package-data]
+desqueeze = ["exiftool_desqueeze.config"]
