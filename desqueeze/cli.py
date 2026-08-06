@@ -38,8 +38,8 @@ def _parse_formats(ctx, param, value: str) -> set[str]:
     show_default=True, help="Output folder.",
 )
 @click.option(
-    "--format", "formats", default="tiff", callback=_parse_formats,
-    help="Comma-separated output formats: tiff,dng. Default: tiff.",
+    "--format", "formats", default="tiff,dng", callback=_parse_formats,
+    help="Comma-separated output formats: tiff,dng. Default: tiff,dng.",
 )
 @click.option("--recursive", is_flag=True, help="Recurse into subfolders when INPUT_PATH is a folder.")
 @click.option("--overwrite", is_flag=True, help="Overwrite existing outputs instead of skipping them.")

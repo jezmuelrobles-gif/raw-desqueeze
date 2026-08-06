@@ -47,7 +47,7 @@ class DesqueezeApp:
             top, text="Include subfolders", variable=self.recursive_var,
         ).pack(side="left", padx=(16, 0))
 
-        self.dng_var = tk.BooleanVar(value=False)
+        self.dng_var = tk.BooleanVar(value=True)
         tk.Checkbutton(
             top, text="Also export DNG", variable=self.dng_var,
         ).pack(side="left", padx=(16, 0))

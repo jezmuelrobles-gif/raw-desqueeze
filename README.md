@@ -53,7 +53,9 @@ desqueeze <input_path_or_folder> [--squeeze 1.33] [--out ./desqueezed] [--format
 - `INPUT_PATH` -- a single RAW file or a folder of RAW files.
 - `--squeeze` -- squeeze factor to undo (default `1.33`).
 - `--out` -- output folder (default `./desqueezed`).
-- `--format` -- comma-separated: `tiff`, `dng`, or `tiff,dng` (default `tiff`).
+- `--format` -- comma-separated: `tiff`, `dng`, or `tiff,dng` (default
+  `tiff,dng` -- both are written unless you narrow it down). See the DNG
+  limitation note below before relying on the DNG for anything color-critical.
 - `--recursive` -- recurse into subfolders.
 - `--overwrite` -- overwrite existing outputs (default: skip files whose
   output already exists).
