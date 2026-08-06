@@ -21,6 +21,7 @@ dev = ["pytest>=8.0"]
 
 [project.scripts]
 desqueeze = "desqueeze.cli:main"
+desqueeze-farm = "desqueeze.farm_cli:main"
 
 [tool.setuptools.packages.find]
 include = ["desqueeze*"]

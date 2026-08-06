@@ -2,7 +2,9 @@
 
 Batch CLI that takes RAW photo stills shot through a squeezed anamorphic lens
 (default 1.33x) and outputs full-resolution, correctly desqueezed 16-bit TIFF
-(and optionally linear DNG).
+(and optionally linear DNG). There's also `desqueeze-farm`, an alternate,
+deliberately non-neutral sibling tool that applies a consistent warm
+"farmhouse" creative grade across a whole batch -- see below.
 
 ## How it works
 
@@ -126,6 +128,36 @@ DNG structure (DNG 1.4, `LinearRaw` photometric), but not reversible, and not
 validated against Adobe's DNG SDK. **TIFF is the reliable, fully edit-ready
 output** -- use DNG only if your downstream tool specifically requires a DNG
 container, and verify it opens correctly there first.
+
+## Alternate version: warm farm creative grade
+
+`desqueeze-farm` is a sibling tool, not a mode of the main command -- the main
+`desqueeze` pipeline is deliberately neutral/color-accurate by design, so this
+lives separately rather than compromising that. It applies a warm "farmhouse"
+creative look to a whole batch, researched from real preset breakdowns rather
+than guessed:
+
+- **Homogeneous across the batch**: every frame is decoded with one *fixed*
+  daylight white-balance baseline (a camera calibration constant) instead of
+  each shot's own as-shot auto-WB estimate, which measurably drifts frame to
+  frame across a real session. Each frame's exposure is then normalized to a
+  common target median luminance before grading, so a shot from full sun and
+  one from open shade land at the same brightness.
+- **The look**: warm white-balance push, a matte/lifted shadow floor (film-style,
+  not crushed black), gentle S-curve contrast with a soft highlight rolloff
+  instead of a hard clip, muted overall saturation with selective vibrance
+  (mutes already-bold colors less, lifts flat ones more), a sage-green hue
+  shift, a barn-red warm boost, and a soft vignette.
+
+```bash
+desqueeze-farm <input_path_or_folder> [--squeeze 1.33] [--out ./farm_graded] [--recursive] [--overwrite] [--exposure-target 0.18]
+```
+
+Output is always a display-ready 16-bit TIFF (`<name>_farm.tiff`) -- unlike
+the main tool's log-profile output, this is meant to be looked at directly,
+not graded further. A matching desktop app (`farm_gui_app.pyw` / the "RAW
+Desqueeze - Farm" shortcut) works the same way as the main one: pick a folder,
+it grades everything in it automatically.
 
 ## Edge cases handled
 

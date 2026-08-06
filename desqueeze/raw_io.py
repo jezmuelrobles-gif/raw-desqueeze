@@ -50,16 +50,22 @@ def find_raw_files(root: Path, recursive: bool) -> tuple[list[Path], list[Path]]
     return supported, skipped
 
 
-def decode_raw(path: Path, linear: bool = False) -> DecodedRaw:
+def decode_raw(path: Path, linear: bool = False, white_balance: list[float] | None = None) -> DecodedRaw:
     """Decode a RAW file into a full-resolution, minimally-developed 16-bit RGB array.
 
-    Development is intentionally neutral: as-shot white balance, standard demosaic,
-    no auto-exposure/contrast/saturation adjustments. By default this also applies
-    a standard display gamma, reproducing the same normal, recognizable rendering a
-    RAW viewer or Lightroom's default develop would show. Pass linear=True to skip
-    the gamma curve and get scene-linear data instead -- used when a Sony log
-    picture profile (S-Log2/S-Log3) is detected, since the correct log OETF is
-    applied afterward (see color_science.py) rather than a generic display gamma.
+    Development is intentionally neutral: as-shot white balance (unless overridden,
+    see below), standard demosaic, no auto-exposure/contrast/saturation adjustments.
+    By default this also applies a standard display gamma, reproducing the same
+    normal, recognizable rendering a RAW viewer or Lightroom's default develop would
+    show. Pass linear=True to skip the gamma curve and get scene-linear data instead
+    -- used when a Sony log picture profile (S-Log2/S-Log3) is detected, since the
+    correct log OETF is applied afterward (see color_science.py) rather than a
+    generic display gamma.
+
+    white_balance, if given, is a fixed [R, G, B, G2] multiplier list applied to
+    every file instead of each shot's own as-shot estimate -- used by the farm-grade
+    pipeline so a whole batch starts from one consistent color baseline rather than
+    each frame's independent auto-WB decision (which visibly drifts shot to shot).
 
     Orientation embedded in the RAW is applied by LibRaw during postprocessing, so
     the returned array is already right-side-up.
@@ -67,12 +73,15 @@ def decode_raw(path: Path, linear: bool = False) -> DecodedRaw:
     try:
         with rawpy.imread(str(path)) as raw:
             kwargs = dict(
-                use_camera_wb=True,
                 no_auto_bright=True,
                 output_bps=16,
                 output_color=rawpy.ColorSpace.sRGB,
                 demosaic_algorithm=rawpy.DemosaicAlgorithm.AHD,
             )
+            if white_balance is not None:
+                kwargs["user_wb"] = white_balance
+            else:
+                kwargs["use_camera_wb"] = True
             if linear:
                 kwargs["gamma"] = (1, 1)
             rgb = raw.postprocess(**kwargs)
